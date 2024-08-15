@@ -1,10 +1,12 @@
-import React, { useContext, useRef } from "react";
-import { Container, Form, Button } from "react-bootstrap";
+import React, { useContext, useRef, useState } from "react";
+import { Container, Form, Button, Alert } from "react-bootstrap";
 import styles from "./LogIn.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../../store/auth-context";
 
 const LogIn = () => {
+  const [isLoading, setIsloading] = useState(false);
+  const [error, setError] = useState(null);
   const authCtx = useContext(AuthContext);
   const navigate = useNavigate();
   const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
@@ -15,6 +17,8 @@ const LogIn = () => {
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
     try {
+      setIsloading(true);
+      setError(null);
       const res = await fetch(
         `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseApiKey}`,
         {
@@ -43,13 +47,16 @@ const LogIn = () => {
       passwordInputRef.current.value = "";
       navigate("/dashboard");
     } catch (err) {
-      alert(err.message);
+      setError(err.message);
+    } finally {
+      setIsloading(false);
     }
   };
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
       <div className={styles.signInBox}>
         <h2 className="text-center mb-4">LogIn</h2>
+        {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="formEmail" className="mb-3">
             <Form.Control
@@ -67,7 +74,16 @@ const LogIn = () => {
               className={styles.floatingInput}
             />
           </Form.Group>
-          <Button variant="primary" type="submit" className="w-100">
+          <div className="mt-3 mb-3">
+            <span>Forgot password ? </span>
+            <Link to="/auth/forgotpassword">Click Here</Link>
+          </div>
+          <Button
+            variant="primary"
+            type="submit"
+            className="w-100"
+            disabled={isLoading}
+          >
             Sign In
           </Button>
         </Form>

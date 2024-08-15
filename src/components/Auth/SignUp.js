@@ -1,11 +1,13 @@
-import React, { useContext, useRef } from "react";
-import { Container, Form, Button, FloatingLabel } from "react-bootstrap";
+import React, { useContext, useRef, useState } from "react";
+import { Container, Form, Button, FloatingLabel, Alert } from "react-bootstrap";
 import styles from "./SignUp.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../../store/auth-context";
 
 const SignUp = () => {
   const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
+  const [error, setError] = useState(null);
+  const [isLoading, setIsloading] = useState(false);
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
   const emailRef = useRef();
@@ -18,6 +20,8 @@ const SignUp = () => {
     const enteredPassword = passwordRef.current.value;
     const enteredCnfPassword = cnfPasswordRef.current.value;
     try{
+      setError(null);
+      setIsloading(true);
       if(enteredPassword !== enteredCnfPassword){
         throw new Error('Password did not match.');
       }
@@ -50,13 +54,16 @@ const SignUp = () => {
       cnfPasswordRef.current.value = '';
       navigate('/dashboard');
     } catch(err) {
-      alert(err.message);
+      setError(err.message);
+    } finally{
+      setIsloading(false);
     }
   }
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
       <div className={styles.signUpBox}>
         <h2 className="text-center mb-4">Sign Up</h2>
+        {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={formSubmitHandler}>
           <Form.Group controlId="formEmail" className="mb-3">
             <FloatingLabel
@@ -92,7 +99,7 @@ const SignUp = () => {
               />
             </FloatingLabel>
           </Form.Group>
-          <Button variant="primary" type="submit" className="w-100">
+          <Button variant="primary" type="submit" className="w-100" disabled={setIsloading}>
             Sign Up
           </Button>
         </Form>

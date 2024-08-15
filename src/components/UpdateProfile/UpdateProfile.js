@@ -11,15 +11,9 @@ import {
 import AuthContext from "../../store/auth-context";
 
 const UpdateProfile = () => {
-  const authCtx = useContext(AuthContext);
+  
   const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
-  const [profile, setProfile] = useState({
-    displayName: "",
-    email: "",
-    photoUrl: "",
-    emailVerified: false,
-  });
-  const [updatedProfile, setUpdatedProfile] = useState(profile);
+  const [updatedProfile, setUpdatedProfile] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [error, setError] = useState(null);
@@ -51,13 +45,7 @@ const UpdateProfile = () => {
           throw new Error(newError);
         }
         const userData = data.users[0];
-        console.log(userData);
-        setProfile({
-          displayName: userData.displayName || "",
-          email: userData.email || "",
-          photoUrl: userData.photoUrl || "",
-          emailVerified: userData.emailVerified,
-        });
+        
         setUpdatedProfile({
           displayName: userData.displayName || "",
           photoUrl: userData.photoUrl || "",
@@ -94,7 +82,8 @@ const UpdateProfile = () => {
           }),
         }
       );
-      setProfile(updatedProfile);
+      alert('Profile updated');
+      setError(null);
     } catch (error) {
       setError("Failed to update profile.");
     } finally {
@@ -204,7 +193,7 @@ const UpdateProfile = () => {
           </Col>
         </Row>
 
-        <Button variant="primary" type="submit" className="mt-3">
+        <Button variant="primary" type="submit" className="mt-3" disabled={isLoading}>
           Update Profile
         </Button>
       </Form>
