@@ -1,0 +1,29 @@
+.signInBox {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 100%;
+}
+
+.floatingInput {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.floatingInput::placeholder {
+  font-size: 14px;
+  opacity: 0.5;
+}
+
+button {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
+.text-center {
+  margin-top: 20px;
+  font-size: 14px;
+}
