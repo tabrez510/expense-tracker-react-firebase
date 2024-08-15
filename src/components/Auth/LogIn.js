@@ -1,17 +1,61 @@
-import React from "react";
-import { Container, Form, Button, Row, Col } from "react-bootstrap";
+import React, { useContext, useRef } from "react";
+import { Container, Form, Button } from "react-bootstrap";
 import styles from "./LogIn.module.css";
+import { Link, useNavigate } from "react-router-dom";
+import AuthContext from "../../store/auth-context";
 
 const LogIn = () => {
+  const authCtx = useContext(AuthContext);
+  const navigate = useNavigate();
+  const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
+  const emailInputRef = useRef();
+  const passwordInputRef = useRef();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const enteredEmail = emailInputRef.current.value;
+    const enteredPassword = passwordInputRef.current.value;
+    try {
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseApiKey}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: enteredEmail,
+            password: enteredPassword,
+            returnSecureToken: true,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        let error = "Authentication Failed";
+        if (data && data.error && data.error.message) {
+          error = data.error.message;
+        }
+        throw new Error(error);
+      }
+
+      authCtx.login(data.idToken, data.email);
+      emailInputRef.current.value = "";
+      passwordInputRef.current.value = "";
+      navigate("/dashboard");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
       <div className={styles.signInBox}>
-        <h2 className="text-center mb-4">SignIn</h2>
-        <Form>
+        <h2 className="text-center mb-4">LogIn</h2>
+        <Form onSubmit={handleSubmit}>
           <Form.Group controlId="formEmail" className="mb-3">
             <Form.Control
               type="email"
               placeholder="Email"
+              ref={emailInputRef}
               className={styles.floatingInput}
             />
           </Form.Group>
@@ -19,6 +63,7 @@ const LogIn = () => {
             <Form.Control
               type="password"
               placeholder="Password"
+              ref={passwordInputRef}
               className={styles.floatingInput}
             />
           </Form.Group>
@@ -28,7 +73,7 @@ const LogIn = () => {
         </Form>
         <div className="text-center mt-3">
           <span>Don't have an account? </span>
-          <a href="/signup">Sign Up</a>
+          <Link to="/auth/signup">Sign Up</Link>
         </div>
       </div>
     </Container>

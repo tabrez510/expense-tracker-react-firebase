@@ -1,62 +1,63 @@
-import React from "react";
-
+import React, { useContext } from "react";
+import AuthContext from "../../store/auth-context";
 import {
   Navbar,
   Container,
   Offcanvas,
   Nav,
   Button,
-  Badge,
+  Row,
 } from "react-bootstrap";
-
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Header = (props) => {
+  const navigate = useNavigate();
+  const authCtx = useContext(AuthContext);
+  const isLoggedIn = authCtx.isLoggedIn;
+  const handleProfile = () => {
+    props.showProfile ? props.onHideProfile() : props.onShowProfile();
+  }
+  const logOutHandler = () => {
+    authCtx.logout();
+    navigate("/auth/login");
+  }
   return (
-    <Navbar
-      expand="sm"
-      sticky="top"
-      className="shadow-lg"
-    >
+    <Navbar expand="sm" sticky="top" className="shadow">
       <Container>
         <Navbar.Brand>
-          E commerce
+          {isLoggedIn ? "Weclcome to Expense Tracker" : "Expense Tracker"}
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="offcanvasNavbar-expand-sm" />
         <Navbar.Offcanvas placement="end">
           <Offcanvas.Header closeButton>
-            <Offcanvas.Title>E commerce</Offcanvas.Title>
+            <Offcanvas.Title>
+              {isLoggedIn ? "Weclcome to Expense Tracker" : "Expense Tracker"}
+            </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
-            <Nav className="mx-auto my-auto">
-              <Nav.Link>
-                HOME
-              </Nav.Link>
-              <Nav.Link>
-                STORE
-              </Nav.Link>
-              <Nav.Link>
-                ABOUT
-              </Nav.Link>
-              <Nav.Link>
-                CONTACT
-              </Nav.Link>
-            </Nav>
-            <Nav className="d-flex flex-row justify-content-between align-items-center">
-              <Nav.Link>
-                <Button variant="primary">Login</Button>
-              </Nav.Link>
-              <Nav.Link>
-                <Button variant="outline-primary">Signup</Button>
-              </Nav.Link>
-              <Nav.Link>
-                <Button variant="danger">Logout</Button>
-              </Nav.Link>
-
-              <Nav.Link>
-                <Button variant="primary" onClick={props.onShow}>
-                  Cart <Badge bg="dark">0</Badge>
-                </Button>
-              </Nav.Link>
+            <Nav className="mx-auto">
+              {!isLoggedIn && (
+                <Nav.Link as={NavLink} to="/auth/login">
+                  <Button variant="primary">Login</Button>
+                </Nav.Link>
+              )}
+              {!isLoggedIn && (
+                <Nav.Link as={NavLink} to="/auth/signup">
+                  <Button variant="outline-primary">Signup</Button>
+                </Nav.Link>
+              )}
+              {isLoggedIn && (
+                <Nav.Link>
+                  <Button variant="primary" onClick={handleProfile}>
+                    Edit Profile
+                  </Button>
+                </Nav.Link>
+              )}
+              {isLoggedIn && (
+                <Nav.Link>
+                  <Button variant="danger" onClick={logOutHandler}>Logout</Button>
+                </Nav.Link>
+              )}
             </Nav>
           </Offcanvas.Body>
         </Navbar.Offcanvas>
