@@ -75,7 +75,7 @@ const SignUp = () => {
                 type="email"
                 placeholder="Email"
                 ref={emailRef}
-                className={styles.floatingInput}
+                // className={styles.floatingInput}
               />
             </FloatingLabel>
           </Form.Group>
@@ -85,21 +85,21 @@ const SignUp = () => {
                 type="password"
                 placeholder="Password"
                 ref={passwordRef}
-                className={styles.floatingInput}
+                // className={styles.floatingInput}
               />
             </FloatingLabel>
           </Form.Group>
           <Form.Group controlId="formConfirmPassword" className="mb-3">
-            <FloatingLabel controlId="floatingPassword" label="Password">
+            <FloatingLabel controlId="formConfirmPassword" label="Confirm Password">
               <Form.Control
                 type="password"
                 placeholder="Confirm Password"
                 ref={cnfPasswordRef}
-                className={styles.floatingInput}
+                // className={styles.floatingInput}
               />
             </FloatingLabel>
           </Form.Group>
-          <Button variant="primary" type="submit" className="w-100" disabled={setIsloading}>
+          <Button variant="primary" type="submit" className="w-100" disabled={isLoading}>
             Sign Up
           </Button>
         </Form>

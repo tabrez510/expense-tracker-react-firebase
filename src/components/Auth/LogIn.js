@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from "react";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert, FloatingLabel } from "react-bootstrap";
 import styles from "./LogIn.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../../store/auth-context";
@@ -59,20 +59,28 @@ const LogIn = () => {
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="formEmail" className="mb-3">
-            <Form.Control
-              type="email"
-              placeholder="Email"
-              ref={emailInputRef}
-              className={styles.floatingInput}
-            />
+            <FloatingLabel
+              controlId="formEmail"
+              label="Email address"
+              className="mb-3"
+            >
+              <Form.Control
+                type="email"
+                placeholder="Email"
+                ref={emailInputRef}
+                // className={styles.floatingInput}
+              />
+            </FloatingLabel>
           </Form.Group>
           <Form.Group controlId="formPassword" className="mb-3">
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              ref={passwordInputRef}
-              className={styles.floatingInput}
-            />
+            <FloatingLabel controlId="formPassword" label="Password">
+              <Form.Control
+                type="password"
+                placeholder="Password"
+                ref={passwordInputRef}
+                // className={styles.floatingInput}
+              />
+            </FloatingLabel>
           </Form.Group>
           <div className="mt-3 mb-3">
             <span>Forgot password ? </span>

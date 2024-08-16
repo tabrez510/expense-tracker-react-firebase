@@ -8,7 +8,6 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-import AuthContext from "../../store/auth-context";
 
 const UpdateProfile = () => {
   
@@ -17,10 +16,11 @@ const UpdateProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState('');
 
-  const userIdToken = localStorage.getItem("Token"); // Replace with actual token
+  const userIdToken = localStorage.getItem("Token"); 
 
-  // Fetch user data on mount
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -62,11 +62,11 @@ const UpdateProfile = () => {
     fetchUserData();
   }, [userIdToken]);
 
-  // Handle form submission
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
       setIsLoading(true);
+      setMessage('');
       await fetch(
         `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${firebaseApiKey}`,
         {
@@ -82,7 +82,7 @@ const UpdateProfile = () => {
           }),
         }
       );
-      alert('Profile updated');
+      setMessage('Profile updated');
       setError(null);
     } catch (error) {
       setError("Failed to update profile.");
@@ -91,7 +91,6 @@ const UpdateProfile = () => {
     }
   };
 
-  // Send email verification
   const sendEmailVerification = async () => {
     try {
       setIsLoading(true);
@@ -126,7 +125,8 @@ const UpdateProfile = () => {
 
   return (
     <Container className="mt-4">
-      <h2>Update Profile</h2>
+      <h2 className="mb-4">Update Profile</h2>
+      {message && <Alert variant="success">{message}</Alert>}
       {error && <Alert variant="danger">{error}</Alert>}
       <Form onSubmit={handleUpdate}>
         <Row>
