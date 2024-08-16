@@ -22,6 +22,12 @@ const Expenses = () => {
     setEditId(null);
   };
 
+  const handleInputChange = (e) =>
+    setEditData((prev) => ({
+      ...prev,
+      description: e.target.value,
+    }));
+
   return (
     <Container className="mt-4">
       <Table responsive bordered hover size="sm">
@@ -41,35 +47,20 @@ const Expenses = () => {
                   <Form.Control
                     type="number"
                     value={editData.amount}
-                    onChange={(e) =>
-                      setEditData((prev) => ({
-                        ...prev,
-                        amount: e.target.value,
-                      }))
-                    }
+                    onChange={handleInputChange}
                   />
                 </td>
                 <td>
                   <Form.Control
                     type="text"
                     value={editData.description}
-                    onChange={(e) =>
-                      setEditData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
+                    onChange={handleInputChange}
                   />
                 </td>
                 <td>
                   <Form.Select
                     value={editData.category}
-                    onChange={(e) =>
-                      setEditData((prev) => ({
-                        ...prev,
-                        category: e.target.value,
-                      }))
-                    }
+                    onChange={handleInputChange}
                   >
                     <option value="Food">Food</option>
                     <option value="Fuel">Fuel</option>
@@ -88,7 +79,7 @@ const Expenses = () => {
                 <td>{item.amount}</td>
                 <td>{item.description}</td>
                 <td>{item.category}</td>
-                <td>
+                <td className="d-flex flex-row justify-content-between align-items-center">
                   <Button
                     size="sm"
                     variant="info"

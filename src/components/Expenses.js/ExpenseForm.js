@@ -12,7 +12,7 @@ import ExpenseContext from "../../store/expense-context";
 const ExpenseForm = () => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("Food");
 
   const { addItem } = useContext(ExpenseContext);
 
@@ -70,7 +70,7 @@ const ExpenseForm = () => {
               </Form.Select>
             </FloatingLabel>
           </Col>
-          <Col md="auto">
+          <Col md>
             <Button variant="primary" type="submit" size="lg">
               Add
             </Button>

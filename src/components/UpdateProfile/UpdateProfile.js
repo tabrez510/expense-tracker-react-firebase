@@ -10,16 +10,18 @@ import {
 } from "react-bootstrap";
 
 const UpdateProfile = () => {
-  
   const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
-  const [updatedProfile, setUpdatedProfile] = useState({});
+  const [updatedProfile, setUpdatedProfile] = useState({
+    displayName: "",
+    photoUrl: "",
+    email: "",
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
-  const userIdToken = localStorage.getItem("Token"); 
-
+  const userIdToken = localStorage.getItem("Token");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,7 +47,7 @@ const UpdateProfile = () => {
           throw new Error(newError);
         }
         const userData = data.users[0];
-        
+
         setUpdatedProfile({
           displayName: userData.displayName || "",
           photoUrl: userData.photoUrl || "",
@@ -66,7 +68,7 @@ const UpdateProfile = () => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      setMessage('');
+      setMessage("");
       await fetch(
         `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${firebaseApiKey}`,
         {
@@ -82,7 +84,7 @@ const UpdateProfile = () => {
           }),
         }
       );
-      setMessage('Profile updated');
+      setMessage("Profile updated");
       setError(null);
     } catch (error) {
       setError("Failed to update profile.");
@@ -130,52 +132,54 @@ const UpdateProfile = () => {
       {error && <Alert variant="danger">{error}</Alert>}
       <Form onSubmit={handleUpdate}>
         <Row>
-          <Col xs={12} md={6} >
-            <Form.Group controlId="displayName">
-              <FloatingLabel label="Name" className="mb-3">
-                <Form.Control
-                  type="text"
-                  name="displayName"
-                  value={updatedProfile.displayName}
-                  onChange={handleChange}
-                  placeholder="Enter your name"
-                />
-              </FloatingLabel>
-            </Form.Group>
+          <Col xs={12} md={6}>
+            <FloatingLabel
+              controlId="displayName"
+              label="Name"
+              className="mb-3"
+            >
+              <Form.Control
+                type="text"
+                name="displayName"
+                value={updatedProfile.displayName}
+                onChange={handleChange}
+                placeholder="Enter your name"
+              />
+            </FloatingLabel>
           </Col>
-          <Col xs={12} md={6} >
-            <Form.Group controlId="photoUrl">
-              <FloatingLabel label="Photo URL" className="mb-3">
-                <Form.Control
-                  type="url"
-                  name="photoUrl"
-                  value={updatedProfile.photoUrl}
-                  onChange={handleChange}
-                  placeholder="Enter your photo URL"
-                />
-              </FloatingLabel>
-            </Form.Group>
+          <Col xs={12} md={6}>
+            <FloatingLabel
+              controlId="photoUrl"
+              label="Photo URL"
+              className="mb-3"
+            >
+              <Form.Control
+                type="url"
+                name="photoUrl"
+                value={updatedProfile.photoUrl}
+                onChange={handleChange}
+                placeholder="Enter your photo URL"
+              />
+            </FloatingLabel>
           </Col>
         </Row>
 
         <Row>
           <Col>
-            <Form.Group controlId="email">
-              <FloatingLabel
-                controlId="floatingInput"
-                label="Email address"
-                className="mb-3"
-              >
-                <Form.Control
-                  type="email"
-                  name="email"
-                  value={updatedProfile.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  disabled
-                />
-              </FloatingLabel>
-            </Form.Group>
+            <FloatingLabel
+              controlId="email"
+              label="Email address"
+              className="mb-3"
+            >
+              <Form.Control
+                type="email"
+                name="email"
+                value={updatedProfile.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                disabled
+              />
+            </FloatingLabel>
           </Col>
           <Col className="d-flex align-items-center">
             {isEmailVerified ? (
@@ -193,7 +197,12 @@ const UpdateProfile = () => {
           </Col>
         </Row>
 
-        <Button variant="primary" type="submit" className="mt-3" disabled={isLoading}>
+        <Button
+          variant="primary"
+          type="submit"
+          className="mt-3"
+          disabled={isLoading}
+        >
           Update Profile
         </Button>
       </Form>
