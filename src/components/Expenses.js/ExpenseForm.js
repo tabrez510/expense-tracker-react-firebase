@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import {
   Form,
@@ -7,15 +7,17 @@ import {
   Col,
   FloatingLabel,
   Container,
+  Spinner,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { expenseActions } from "../../store/expense";
 
 const ExpenseForm = () => {
   const [amount, setAmount] = useState("");
+  const [isLoading, setIsloading] = useState(false);
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Food");
-  const uid = localStorage.getItem('uid');
+  const uid = localStorage.getItem("uid");
 
   const dispatch = useDispatch();
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -27,23 +29,31 @@ const ExpenseForm = () => {
       description,
       category,
     };
-      try {
-        const response = await axios.post(
-          `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}.json`,
-          expense
-        );
-        const newItem = { id: response.data.name, ...expense };
-        dispatch(expenseActions.addItem(newItem));
-        setAmount("");
-        setDescription("");
-        setCategory("Food");
-      } catch (error) {
-        console.error("Failed to add expense:", error);
-      }
+    try {
+      setIsloading(true);
+      const response = await axios.post(
+        `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}.json`,
+        expense
+      );
+      const newItem = { id: response.data.name, ...expense };
+      dispatch(expenseActions.addItem(newItem));
+      setAmount("");
+      setDescription("");
+      setCategory("Food");
+    } catch (error) {
+      alert(error.message);
+      console.error("Failed to add expense:", error.message);
+    } finally {
+      setIsloading(false);
+    }
   };
 
   return (
-    <Container className="mt-4" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
+    <Container
+      className="mt-4"
+      bg={darkMode ? "dark" : "light"}
+      data-bs-theme={darkMode ? "dark" : "light"}
+    >
       <h3 className="text-center mt-5 mb-5">Add/Manage Your Expenses</h3>
       <Form onSubmit={handleSubmit} className="mb-4">
         <Row className="g-3">
@@ -84,7 +94,20 @@ const ExpenseForm = () => {
           </Col>
           <Col md>
             <Button variant="primary" type="submit" size="lg">
-              Add
+              {isLoading ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />{" "}
+                  Loading...
+                </>
+              ) : (
+                "Add"
+              )}
             </Button>
           </Col>
         </Row>

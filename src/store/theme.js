@@ -1,13 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-let theme = localStorage.getItem('theme');
-if(!theme){
-    theme = false;
-} else {
-    theme = theme === 'true' ? true : false;
-}
 const initialThemeState = {
-    darkMode: true
+    darkMode: false,
+    isPremium: false
 }
 
 const themeSlice = createSlice({
@@ -15,7 +10,14 @@ const themeSlice = createSlice({
     initialState: initialThemeState,
     reducers: {
         toggleTheme(state){
-            state.darkMode = !state.darkMode
+            state.darkMode = !state.darkMode;
+        },
+        addPremium(state){
+            state.isPremium = true;
+        },
+        removePremium(state){
+            state.isPremium = false;
+            state.darkMode = false;
         }
     }
 })

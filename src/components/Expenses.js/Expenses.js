@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Table, Button, Form, Container } from "react-bootstrap";
+import { Table, Button, Form, Container, Spinner } from "react-bootstrap";
 import { expenseActions } from "../../store/expense";
 import { useDispatch, useSelector } from "react-redux";
 
 const Expenses = () => {
+  const [isLoading, setIsloading] = useState(false);
   const items = useSelector((state) => state.expense.items);
   const [editId, setEditId] = useState(null);
-  const uid = localStorage.getItem('uid');
+  const uid = localStorage.getItem("uid");
   const [editData, setEditData] = useState({
     amount: "",
     description: "",
@@ -19,6 +20,7 @@ const Expenses = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
+        setIsloading(true);
         const response = await axios.get(
           `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}.json`
         );
@@ -31,12 +33,15 @@ const Expenses = () => {
           dispatch(expenseActions.saveData(loadedExpenses));
         }
       } catch (error) {
+        alert(error.message);
         console.error("Failed to fetch expenses:", error);
+      } finally {
+        setIsloading(false);
       }
     };
 
     fetchExpenses();
-  }, [uid]);
+  }, [uid, dispatch]);
 
   const handleEdit = (id) => {
     const item = items.find((item) => item.id === id);
@@ -53,15 +58,20 @@ const Expenses = () => {
     } catch (error) {
       console.error("Failed to delete expense:", error);
     }
-  }
+  };
 
-  const handleSave = async () => {
+  const handleSaveEdited = async () => {
     try {
       await axios.put(
         `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}/${editId}.json`,
         { ...editData, id: editId }
       );
-      dispatch(expenseActions.editItem({id: editId, updatedExpense: { ...editData, id: editId }}));
+      dispatch(
+        expenseActions.editItem({
+          id: editId,
+          updatedExpense: { ...editData, id: editId },
+        })
+      );
       setEditId(null);
     } catch (error) {
       console.error("Failed to edit expense:", error);
@@ -69,92 +79,108 @@ const Expenses = () => {
   };
 
   return (
-    <Container className="mt-4" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
-      <Table responsive bordered hover size="sm">
-        <thead>
-          <tr>
-            <th>Amount</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) =>
-            editId === item.id ? (
-              <tr key={item.id}>
-                <td>
-                  <Form.Control
-                    type="number"
-                    value={editData.amount}
-                    onChange={(e) =>
-                      setEditData((prev) => ({
-                        ...prev,
-                        amount: e.target.value,
-                      }))
-                    }
-                  />
-                </td>
-                <td>
-                  <Form.Control
-                    type="text"
-                    value={editData.description}
-                    onChange={(e) =>
-                      setEditData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                  />
-                </td>
-                <td>
-                  <Form.Select
-                    value={editData.category}
-                    onChange={(e) =>
-                      setEditData((prev) => ({
-                        ...prev,
-                        category: e.target.value,
-                      }))
-                    }
-                  >
-                    <option value="Food">Food</option>
-                    <option value="Fuel">Fuel</option>
-                    <option value="Entertainment">Entertainment</option>
-                    <option value="Other">Other</option>
-                  </Form.Select>
-                </td>
-                <td>
-                  <Button size="sm" variant="success" onClick={handleSave}>
-                    Save
-                  </Button>
-                </td>
-              </tr>
-            ) : (
-              <tr key={item.id}>
-                <td>{item.amount}</td>
-                <td>{item.description}</td>
-                <td>{item.category}</td>
-                <td className="d-flex flex-row justify-content-between align-items-center">
-                  <Button
-                    size="sm"
-                    variant="info"
-                    onClick={() => handleEdit(item.id)}
-                  >
-                    Edit
-                  </Button>{" "}
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            )
-          )}
-        </tbody>
-      </Table>
+    <Container
+      className="mt-4"
+      bg={darkMode ? "dark" : "light"}
+      data-bs-theme={darkMode ? "dark" : "light"}
+    >
+      {isLoading ? (
+        <div className="d-flex justify-content-center align-items-center" style={{ height: '60vh' }}>
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </div>
+      ) : (
+        <Table responsive bordered hover size="sm">
+          <thead>
+            <tr>
+              <th>Amount</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) =>
+              editId === item.id ? (
+                <tr key={item.id}>
+                  <td>
+                    <Form.Control
+                      type="number"
+                      value={editData.amount}
+                      onChange={(e) =>
+                        setEditData((prev) => ({
+                          ...prev,
+                          amount: e.target.value,
+                        }))
+                      }
+                    />
+                  </td>
+                  <td>
+                    <Form.Control
+                      type="text"
+                      value={editData.description}
+                      onChange={(e) =>
+                        setEditData((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                    />
+                  </td>
+                  <td>
+                    <Form.Select
+                      value={editData.category}
+                      onChange={(e) =>
+                        setEditData((prev) => ({
+                          ...prev,
+                          category: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="Food">Food</option>
+                      <option value="Fuel">Fuel</option>
+                      <option value="Entertainment">Entertainment</option>
+                      <option value="Other">Other</option>
+                    </Form.Select>
+                  </td>
+                  <td>
+                    <Button
+                      size="sm"
+                      variant="success"
+                      onClick={handleSaveEdited}
+                    >
+                      Save
+                    </Button>
+                  </td>
+                </tr>
+              ) : (
+                <tr key={item.id}>
+                  <td>{item.amount}</td>
+                  <td>{item.description}</td>
+                  <td>{item.category}</td>
+                  <td className="d-flex flex-row justify-content-between align-items-center">
+                    <Button
+                      size="sm"
+                      variant="info"
+                      onClick={() => handleEdit(item.id)}
+                    >
+                      Edit
+                    </Button>{" "}
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </Table>
+      )}
     </Container>
   );
 };

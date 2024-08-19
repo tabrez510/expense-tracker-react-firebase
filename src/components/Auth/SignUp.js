@@ -1,5 +1,12 @@
-import React, { useContext, useRef, useState } from "react";
-import { Container, Form, Button, FloatingLabel, Alert } from "react-bootstrap";
+import React, { useRef, useState } from "react";
+import {
+  Container,
+  Form,
+  Button,
+  FloatingLabel,
+  Alert,
+  Spinner,
+} from "react-bootstrap";
 import styles from "./SignUp.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,7 +17,6 @@ const SignUp = () => {
   const [error, setError] = useState(null);
   const [isLoading, setIsloading] = useState(false);
   const navigate = useNavigate();
-  // const authCtx = useContext(AuthContext);
   const dispatch = useDispatch();
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -21,11 +27,11 @@ const SignUp = () => {
     const enteredEmail = emailRef.current.value;
     const enteredPassword = passwordRef.current.value;
     const enteredCnfPassword = cnfPasswordRef.current.value;
-    try{
+    try {
       setError(null);
       setIsloading(true);
-      if(enteredPassword !== enteredCnfPassword){
-        throw new Error('Password did not match.');
+      if (enteredPassword !== enteredCnfPassword) {
+        throw new Error("Password did not match.");
       }
       const res = await fetch(
         `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseApiKey}`,
@@ -42,29 +48,36 @@ const SignUp = () => {
         }
       );
       const data = await res.json();
-      if(!res.ok){
+      if (!res.ok) {
         let error = "SignUp Failed";
-        if(data && data.error && data.error.message){
+        if (data && data.error && data.error.message) {
           error = data.error.message;
         }
         throw new Error(error);
       }
 
-      dispatch(authActions.login({token: data.idToken, uid: data.localId}));
-      emailRef.current.value = '';
-      passwordRef.current.value = '';
-      cnfPasswordRef.current.value = '';
-      navigate('/dashboard');
-    } catch(err) {
+      dispatch(authActions.login({ token: data.idToken, uid: data.localId }));
+      emailRef.current.value = "";
+      passwordRef.current.value = "";
+      cnfPasswordRef.current.value = "";
+      navigate("/dashboard");
+    } catch (err) {
       setError(err.message);
-    } finally{
+    } finally {
       setIsloading(false);
     }
-  }
+  };
   const darkMode = useSelector((state) => state.theme.darkMode);
   return (
-    <Container className="d-flex justify-content-center align-items-center vh-100" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
-      <div className={styles.signUpBox} style={{backgroundColor:darkMode?'#000':'#fff'}}>
+    <Container
+      className="d-flex justify-content-center align-items-center vh-100"
+      bg={darkMode ? "dark" : "light"}
+      data-bs-theme={darkMode ? "dark" : "light"}
+    >
+      <div
+        className={styles.signUpBox}
+        style={{ backgroundColor: darkMode ? "#000" : "#fff" }}
+      >
         <h2 className="text-center mb-4">Sign Up</h2>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={formSubmitHandler}>
@@ -74,12 +87,7 @@ const SignUp = () => {
               label="Email address"
               className="mb-3"
             >
-              <Form.Control
-                type="email"
-                placeholder="Email"
-                ref={emailRef}
-                // className={styles.floatingInput}
-              />
+              <Form.Control type="email" placeholder="Email" ref={emailRef} />
             </FloatingLabel>
           </Form.Group>
           <Form.Group controlId="formPassword" className="mb-3">
@@ -88,22 +96,41 @@ const SignUp = () => {
                 type="password"
                 placeholder="Password"
                 ref={passwordRef}
-                // className={styles.floatingInput}
               />
             </FloatingLabel>
           </Form.Group>
           <Form.Group controlId="formConfirmPassword" className="mb-3">
-            <FloatingLabel controlId="formConfirmPassword" label="Confirm Password">
+            <FloatingLabel
+              controlId="formConfirmPassword"
+              label="Confirm Password"
+            >
               <Form.Control
                 type="password"
                 placeholder="Confirm Password"
                 ref={cnfPasswordRef}
-                // className={styles.floatingInput}
               />
             </FloatingLabel>
           </Form.Group>
-          <Button variant="primary" type="submit" className="w-100" disabled={isLoading}>
-            Sign Up
+          <Button
+            variant="primary"
+            type="submit"
+            className="w-100"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />{" "}
+                Loading...
+              </>
+            ) : (
+              "Sign Up"
+            )}
           </Button>
         </Form>
         <div className="text-center mt-3">

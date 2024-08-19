@@ -1,5 +1,12 @@
 import React, { useRef, useState } from "react";
-import { Container, Form, Button, Alert, FloatingLabel } from "react-bootstrap";
+import {
+  Container,
+  Form,
+  Button,
+  Alert,
+  FloatingLabel,
+  Spinner,
+} from "react-bootstrap";
 import styles from "./LogIn.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -43,7 +50,7 @@ const LogIn = () => {
         throw new Error(error);
       }
 
-      dispatch(authActions.login({token: data.idToken, uid: data.localId}));
+      dispatch(authActions.login({ token: data.idToken, uid: data.localId }));
       emailInputRef.current.value = "";
       passwordInputRef.current.value = "";
       navigate("/dashboard");
@@ -55,8 +62,15 @@ const LogIn = () => {
   };
   const darkMode = useSelector((state) => state.theme.darkMode);
   return (
-    <Container className="d-flex justify-content-center align-items-center vh-100" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
-      <div className={styles.signInBox} style={{backgroundColor:darkMode?'#000':'#fff'}}>
+    <Container
+      className="d-flex justify-content-center align-items-center vh-100"
+      bg={darkMode ? "dark" : "light"}
+      data-bs-theme={darkMode ? "dark" : "light"}
+    >
+      <div
+        className={styles.signInBox}
+        style={{ backgroundColor: darkMode ? "#000" : "#fff" }}
+      >
         <h2 className="text-center mb-4">LogIn</h2>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
@@ -92,7 +106,20 @@ const LogIn = () => {
             className="w-100"
             disabled={isLoading}
           >
-            Sign In
+            {isLoading ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />{" "}
+                Loading...
+              </>
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </Form>
         <div className="text-center mt-3">

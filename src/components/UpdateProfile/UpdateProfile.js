@@ -7,6 +7,7 @@ import {
   FloatingLabel,
   Row,
   Col,
+  Spinner,
 } from "react-bootstrap";
 import { useSelector } from "react-redux";
 
@@ -17,7 +18,7 @@ const UpdateProfile = () => {
     photoUrl: "",
     email: "",
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
@@ -27,6 +28,7 @@ const UpdateProfile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${firebaseApiKey}`,
           {
@@ -63,7 +65,7 @@ const UpdateProfile = () => {
     };
 
     fetchUserData();
-  }, [userIdToken]);
+  }, [userIdToken, firebaseApiKey]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -129,7 +131,11 @@ const UpdateProfile = () => {
   const darkMode = useSelector((state) => state.theme.darkMode);
 
   return (
-    <Container className="mt-4" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
+    <Container
+      className="mt-4"
+      bg={darkMode ? "dark" : "light"}
+      data-bs-theme={darkMode ? "dark" : "light"}
+    >
       <h2 className="mb-4">Update Profile</h2>
       {message && <Alert variant="success">{message}</Alert>}
       {error && <Alert variant="danger">{error}</Alert>}
@@ -206,7 +212,20 @@ const UpdateProfile = () => {
           className="mt-3"
           disabled={isLoading}
         >
-          Update Profile
+          {isLoading ? (
+            <>
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />{" "}
+              Loading...
+            </>
+          ) : (
+            "Update"
+          )}
         </Button>
       </Form>
     </Container>
