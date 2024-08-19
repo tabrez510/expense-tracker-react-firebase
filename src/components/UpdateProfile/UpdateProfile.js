@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Form,
@@ -8,6 +8,7 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
 const UpdateProfile = () => {
   const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
@@ -21,7 +22,7 @@ const UpdateProfile = () => {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
 
-  const userIdToken = localStorage.getItem("Token");
+  const userIdToken = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -125,8 +126,10 @@ const UpdateProfile = () => {
     }));
   };
 
+  const darkMode = useSelector((state) => state.theme.darkMode);
+
   return (
-    <Container className="mt-4">
+    <Container className="mt-4" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
       <h2 className="mb-4">Update Profile</h2>
       {message && <Alert variant="success">{message}</Alert>}
       {error && <Alert variant="danger">{error}</Alert>}

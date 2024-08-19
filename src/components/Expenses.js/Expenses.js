@@ -1,15 +1,42 @@
-import React, { useContext, useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Table, Button, Form, Container } from "react-bootstrap";
-import ExpenseContext from "../../store/expense-context";
+import { expenseActions } from "../../store/expense";
+import { useDispatch, useSelector } from "react-redux";
 
 const Expenses = () => {
-  const { items, removeItem, editItem } = useContext(ExpenseContext);
+  const items = useSelector((state) => state.expense.items);
   const [editId, setEditId] = useState(null);
+  const uid = localStorage.getItem('uid');
   const [editData, setEditData] = useState({
     amount: "",
     description: "",
     category: "Food",
   });
+  const dispatch = useDispatch();
+  const darkMode = useSelector((state) => state.theme.darkMode);
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const response = await axios.get(
+          `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}.json`
+        );
+        const data = response.data;
+        if (data) {
+          const loadedExpenses = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          dispatch(expenseActions.saveData(loadedExpenses));
+        }
+      } catch (error) {
+        console.error("Failed to fetch expenses:", error);
+      }
+    };
+
+    fetchExpenses();
+  }, [uid]);
 
   const handleEdit = (id) => {
     const item = items.find((item) => item.id === id);
@@ -17,19 +44,32 @@ const Expenses = () => {
     setEditData(item);
   };
 
-  const handleSave = () => {
-    editItem(editId, { ...editData, id: editId });
-    setEditId(null);
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(
+        `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}/${id}.json`
+      );
+      dispatch(expenseActions.removeItem(id));
+    } catch (error) {
+      console.error("Failed to delete expense:", error);
+    }
+  }
+
+  const handleSave = async () => {
+    try {
+      await axios.put(
+        `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}/${editId}.json`,
+        { ...editData, id: editId }
+      );
+      dispatch(expenseActions.editItem({id: editId, updatedExpense: { ...editData, id: editId }}));
+      setEditId(null);
+    } catch (error) {
+      console.error("Failed to edit expense:", error);
+    }
   };
 
-  const handleInputChange = (e) =>
-    setEditData((prev) => ({
-      ...prev,
-      description: e.target.value,
-    }));
-
   return (
-    <Container className="mt-4">
+    <Container className="mt-4" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
       <Table responsive bordered hover size="sm">
         <thead>
           <tr>
@@ -47,20 +87,35 @@ const Expenses = () => {
                   <Form.Control
                     type="number"
                     value={editData.amount}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        amount: e.target.value,
+                      }))
+                    }
                   />
                 </td>
                 <td>
                   <Form.Control
                     type="text"
                     value={editData.description}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                   />
                 </td>
                 <td>
                   <Form.Select
                     value={editData.category}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        category: e.target.value,
+                      }))
+                    }
                   >
                     <option value="Food">Food</option>
                     <option value="Fuel">Fuel</option>
@@ -90,7 +145,7 @@ const Expenses = () => {
                   <Button
                     size="sm"
                     variant="danger"
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => handleDelete(item.id)}
                   >
                     Delete
                   </Button>

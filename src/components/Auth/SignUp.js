@@ -2,14 +2,16 @@ import React, { useContext, useRef, useState } from "react";
 import { Container, Form, Button, FloatingLabel, Alert } from "react-bootstrap";
 import styles from "./SignUp.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import AuthContext from "../../store/auth-context";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../../store/auth";
 
 const SignUp = () => {
   const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
   const [error, setError] = useState(null);
   const [isLoading, setIsloading] = useState(false);
   const navigate = useNavigate();
-  const authCtx = useContext(AuthContext);
+  // const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
   const emailRef = useRef();
   const passwordRef = useRef();
   const cnfPasswordRef = useRef();
@@ -48,7 +50,7 @@ const SignUp = () => {
         throw new Error(error);
       }
 
-      authCtx.login(data.idToken, data.email);
+      dispatch(authActions.login({token: data.idToken, uid: data.localId}));
       emailRef.current.value = '';
       passwordRef.current.value = '';
       cnfPasswordRef.current.value = '';
@@ -59,9 +61,10 @@ const SignUp = () => {
       setIsloading(false);
     }
   }
+  const darkMode = useSelector((state) => state.theme.darkMode);
   return (
-    <Container className="d-flex justify-content-center align-items-center vh-100">
-      <div className={styles.signUpBox}>
+    <Container className="d-flex justify-content-center align-items-center vh-100" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
+      <div className={styles.signUpBox} style={{backgroundColor:darkMode?'#000':'#fff'}}>
         <h2 className="text-center mb-4">Sign Up</h2>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={formSubmitHandler}>

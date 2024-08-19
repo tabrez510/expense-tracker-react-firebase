@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import axios from "axios";
 import {
   Form,
   Button,
@@ -7,32 +8,43 @@ import {
   FloatingLabel,
   Container,
 } from "react-bootstrap";
-import ExpenseContext from "../../store/expense-context";
+import { useDispatch, useSelector } from "react-redux";
+import { expenseActions } from "../../store/expense";
 
 const ExpenseForm = () => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Food");
+  const uid = localStorage.getItem('uid');
 
-  const { addItem } = useContext(ExpenseContext);
+  const dispatch = useDispatch();
+  const darkMode = useSelector((state) => state.theme.darkMode);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newItem = {
-      id: Date.now().toString(),
+    const expense = {
       amount,
       description,
       category,
     };
-    addItem(newItem);
-    setAmount("");
-    setDescription("");
-    setCategory("Food");
+      try {
+        const response = await axios.post(
+          `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}.json`,
+          expense
+        );
+        const newItem = { id: response.data.name, ...expense };
+        dispatch(expenseActions.addItem(newItem));
+        setAmount("");
+        setDescription("");
+        setCategory("Food");
+      } catch (error) {
+        console.error("Failed to add expense:", error);
+      }
   };
 
   return (
-    <Container className="mt-4">
-    <h3 className="text-center mt-5 mb-5">Add/Manage Your Expenses</h3>
+    <Container className="mt-4" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
+      <h3 className="text-center mt-5 mb-5">Add/Manage Your Expenses</h3>
       <Form onSubmit={handleSubmit} className="mb-4">
         <Row className="g-3">
           <Col md>

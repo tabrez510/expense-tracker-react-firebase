@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styles from "../components/Auth/LogIn.module.css";
 import { Form, Button, Alert, Container, FloatingLabel } from "react-bootstrap";
 import Header from "../components/Layouts/Header";
+import { useSelector } from "react-redux";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -52,11 +53,13 @@ const ForgotPassword = () => {
     }
   };
 
+  const darkMode = useSelector((state) => state.theme.darkMode);
+
   return (
     <>
       <Header />
-      <Container className="d-flex justify-content-center align-items-center vh-100">
-        <div className={styles.signInBox}>
+      <Container className="d-flex justify-content-center align-items-center vh-100" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
+        <div className={styles.signInBox} style={{backgroundColor:darkMode?'#000':'#fff'}}>
           <h2>Forgot Password</h2>
           {message && <Alert variant="success">{message}</Alert>}
           {error && <Alert variant="danger">{error}</Alert>}

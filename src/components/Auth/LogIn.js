@@ -1,14 +1,15 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Container, Form, Button, Alert, FloatingLabel } from "react-bootstrap";
 import styles from "./LogIn.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import AuthContext from "../../store/auth-context";
+import { useSelector, useDispatch } from "react-redux";
+import { authActions } from "../../store/auth";
 
 const LogIn = () => {
   const [isLoading, setIsloading] = useState(false);
   const [error, setError] = useState(null);
-  const authCtx = useContext(AuthContext);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -42,7 +43,7 @@ const LogIn = () => {
         throw new Error(error);
       }
 
-      authCtx.login(data.idToken, data.email);
+      dispatch(authActions.login({token: data.idToken, uid: data.localId}));
       emailInputRef.current.value = "";
       passwordInputRef.current.value = "";
       navigate("/dashboard");
@@ -52,9 +53,10 @@ const LogIn = () => {
       setIsloading(false);
     }
   };
+  const darkMode = useSelector((state) => state.theme.darkMode);
   return (
-    <Container className="d-flex justify-content-center align-items-center vh-100">
-      <div className={styles.signInBox}>
+    <Container className="d-flex justify-content-center align-items-center vh-100" bg={darkMode?'dark':'light'} data-bs-theme={darkMode?'dark':'light'}>
+      <div className={styles.signInBox} style={{backgroundColor:darkMode?'#000':'#fff'}}>
         <h2 className="text-center mb-4">LogIn</h2>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
@@ -68,7 +70,6 @@ const LogIn = () => {
                 type="email"
                 placeholder="Email"
                 ref={emailInputRef}
-                // className={styles.floatingInput}
               />
             </FloatingLabel>
           </Form.Group>
@@ -78,7 +79,6 @@ const LogIn = () => {
                 type="password"
                 placeholder="Password"
                 ref={passwordInputRef}
-                // className={styles.floatingInput}
               />
             </FloatingLabel>
           </Form.Group>
