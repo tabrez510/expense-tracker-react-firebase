@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Table, Button, Form, Container, Spinner } from "react-bootstrap";
-import { expenseActions } from "../../store/expense";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchExpenses,
+  deleteExpense,
+  editExpense,
+} from "../../store/expense-actions";
 
 const Expenses = () => {
   const [isLoading, setIsloading] = useState(false);
   const items = useSelector((state) => state.expense.items);
   const [editId, setEditId] = useState(null);
-  const uid = localStorage.getItem("uid");
   const [editData, setEditData] = useState({
     amount: "",
     description: "",
@@ -18,30 +20,9 @@ const Expenses = () => {
   const darkMode = useSelector((state) => state.theme.darkMode);
 
   useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        setIsloading(true);
-        const response = await axios.get(
-          `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}.json`
-        );
-        const data = response.data;
-        if (data) {
-          const loadedExpenses = Object.keys(data).map((key) => ({
-            id: key,
-            ...data[key],
-          }));
-          dispatch(expenseActions.saveData(loadedExpenses));
-        }
-      } catch (error) {
-        alert(error.message);
-        console.error("Failed to fetch expenses:", error);
-      } finally {
-        setIsloading(false);
-      }
-    };
-
-    fetchExpenses();
-  }, [uid, dispatch]);
+    setIsloading(true);
+    dispatch(fetchExpenses()).finally(() => setIsloading(false));
+  }, [dispatch]);
 
   const handleEdit = (id) => {
     const item = items.find((item) => item.id === id);
@@ -49,33 +30,13 @@ const Expenses = () => {
     setEditData(item);
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(
-        `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}/${id}.json`
-      );
-      dispatch(expenseActions.removeItem(id));
-    } catch (error) {
-      console.error("Failed to delete expense:", error);
-    }
+  const handleDelete = (id) => {
+    dispatch(deleteExpense(id));
   };
 
-  const handleSaveEdited = async () => {
-    try {
-      await axios.put(
-        `https://http-request-b6341-default-rtdb.firebaseio.com/expenses/${uid}/${editId}.json`,
-        { ...editData, id: editId }
-      );
-      dispatch(
-        expenseActions.editItem({
-          id: editId,
-          updatedExpense: { ...editData, id: editId },
-        })
-      );
-      setEditId(null);
-    } catch (error) {
-      console.error("Failed to edit expense:", error);
-    }
+  const handleSaveEdited = () => {
+    dispatch(editExpense(editId, editData));
+    setEditId(null);
   };
 
   return (
@@ -85,7 +46,10 @@ const Expenses = () => {
       data-bs-theme={darkMode ? "dark" : "light"}
     >
       {isLoading ? (
-        <div className="d-flex justify-content-center align-items-center" style={{ height: '60vh' }}>
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ height: "60vh" }}
+        >
           <Spinner animation="border" role="status">
             <span className="visually-hidden">Loading...</span>
           </Spinner>

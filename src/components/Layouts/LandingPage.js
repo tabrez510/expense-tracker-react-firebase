@@ -4,7 +4,7 @@ import feat1Image from "../../assets/feature_1.jpg";
 import feat2Image from "../../assets/feature_2.jpg";
 import feat3Image from "../../assets/feature_31.jpg";
 import { Link } from "react-router-dom";
-import { Container, Row, Col, Button, Image, NavLink } from "react-bootstrap";
+import { Container, Row, Col, Button, Image } from "react-bootstrap";
 import { useSelector } from "react-redux";
 
 const LandingPage = () => {

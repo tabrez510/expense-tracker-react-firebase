@@ -9,7 +9,6 @@ const Header = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const expenses = useSelector((state) => state.expense.items);
   const darkMode = useSelector((state) => state.theme.darkMode);

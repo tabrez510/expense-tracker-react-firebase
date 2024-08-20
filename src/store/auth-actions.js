@@ -74,8 +74,3 @@ export const signUpUser = (email, password) => {
   };
 };
 
-export const logoutUser = () => {
-  return (dispatch) => {
-    dispatch(authActions.logout());
-  };
-};
