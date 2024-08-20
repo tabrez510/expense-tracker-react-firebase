@@ -59,7 +59,7 @@ const SignUp = () => {
       >
         <h2 className="text-center mb-4">Sign Up</h2>
         {error && <Alert variant="danger">{error}</Alert>}
-        <Form onSubmit={formSubmitHandler}>
+        <Form onSubmit={formSubmitHandler} data-testid="signup-form">
           <Form.Group controlId="formEmail" className="mb-3">
             <FloatingLabel
               controlId="floatingInput"
