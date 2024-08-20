@@ -10,12 +10,11 @@ import {
 import styles from "./SignUp.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { authActions } from "../../store/auth";
+import { signUpUser } from "../../store/auth-actions";
 
 const SignUp = () => {
-  const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
   const [error, setError] = useState(null);
-  const [isLoading, setIsloading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const emailRef = useRef();
@@ -27,36 +26,14 @@ const SignUp = () => {
     const enteredEmail = emailRef.current.value;
     const enteredPassword = passwordRef.current.value;
     const enteredCnfPassword = cnfPasswordRef.current.value;
-    try {
-      setError(null);
-      setIsloading(true);
-      if (enteredPassword !== enteredCnfPassword) {
-        throw new Error("Password did not match.");
-      }
-      const res = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseApiKey}`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: enteredEmail,
-            password: enteredPassword,
-            returnSecureToken: true,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        let error = "SignUp Failed";
-        if (data && data.error && data.error.message) {
-          error = data.error.message;
-        }
-        throw new Error(error);
-      }
 
-      dispatch(authActions.login({ token: data.idToken, uid: data.localId }));
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (enteredPassword !== enteredCnfPassword) {
+        throw new Error("Passwords did not match.");
+      }
+      await dispatch(signUpUser(enteredEmail, enteredPassword));
       emailRef.current.value = "";
       passwordRef.current.value = "";
       cnfPasswordRef.current.value = "";
@@ -64,10 +41,12 @@ const SignUp = () => {
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsloading(false);
+      setIsLoading(false);
     }
   };
+
   const darkMode = useSelector((state) => state.theme.darkMode);
+
   return (
     <Container
       className="d-flex justify-content-center align-items-center vh-100"

@@ -9,58 +9,38 @@ import {
 } from "react-bootstrap";
 import styles from "./LogIn.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { authActions } from "../../store/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../store/auth-actions";
 
 const LogIn = () => {
-  const [isLoading, setIsloading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const firebaseApiKey = process.env.REACT_APP_FIREBASE_API_KEY;
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
-    try {
-      setIsloading(true);
-      setError(null);
-      const res = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseApiKey}`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: enteredEmail,
-            password: enteredPassword,
-            returnSecureToken: true,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        let error = "Authentication Failed";
-        if (data && data.error && data.error.message) {
-          error = data.error.message;
-        }
-        throw new Error(error);
-      }
 
-      dispatch(authActions.login({ token: data.idToken, uid: data.localId }));
+    setIsLoading(true);
+    setError(null);
+    try {
+      await dispatch(loginUser(enteredEmail, enteredPassword));
       emailInputRef.current.value = "";
       passwordInputRef.current.value = "";
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsloading(false);
+      setIsLoading(false);
     }
   };
+
   const darkMode = useSelector((state) => state.theme.darkMode);
+
   return (
     <Container
       className="d-flex justify-content-center align-items-center vh-100"
