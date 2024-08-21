@@ -2,9 +2,9 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../../store/auth";
-import themeReducer from "../../store/theme";
-import LogIn from "./LogIn";
+import authReducer from "../store/auth";
+import themeReducer from "../store/theme";
+import LogIn from "../components/Auth/LogIn";
 
 const mockStore = (initialState) => {
   return configureStore({

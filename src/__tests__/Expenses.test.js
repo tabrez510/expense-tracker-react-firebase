@@ -2,11 +2,11 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../../store/auth";
-import themeReducer from "../../store/theme";
-import expenseReducer from "../../store/expense";
-import Expenses from "./Expenses";
-import ExpenseForm from "./ExpenseForm";
+import authReducer from "../store/auth";
+import themeReducer from "../store/theme";
+import expenseReducer from "../store/expense";
+import Expenses from "../components/Expenses.js/Expenses";
+import ExpenseForm from "../components/Expenses.js/ExpenseForm";
 const mockStore = (initialState) => {
   return configureStore({
     reducer: {
