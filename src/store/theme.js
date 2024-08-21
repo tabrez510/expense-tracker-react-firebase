@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialThemeState = {
-    darkMode: false,
-    isPremium: false
+    darkMode: true,
+    isPremium: true
 }
 
 const themeSlice = createSlice({
@@ -17,7 +17,7 @@ const themeSlice = createSlice({
         },
         removePremium(state){
             state.isPremium = false;
-            state.darkMode = false;
+            state.darkMode = true;
         }
     }
 })

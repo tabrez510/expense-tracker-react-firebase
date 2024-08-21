@@ -71,7 +71,7 @@ const Header = (props) => {
     >
       <Container>
         <Navbar.Brand as={NavLink} to="/">
-          {isLoggedIn ? "Weclcome to Expense Tracker" : "Expense Tracker"}
+          {isLoggedIn ? "Welcome to Expense Tracker" : "Expense Tracker"}
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="offcanvasNavbar-expand-sm" />
         <Navbar.Offcanvas
@@ -103,7 +103,7 @@ const Header = (props) => {
                   </Button>
                 </Nav.Link>
               )}
-              {isPremium && (
+              {isPremium && isLoggedIn && (
                 <Nav.Link>
                   <Button
                     variant={darkMode ? "light" : "dark"}

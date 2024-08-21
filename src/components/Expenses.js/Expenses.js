@@ -126,13 +126,14 @@ const Expenses = () => {
                   <td className="d-flex flex-row justify-content-between align-items-center">
                     <Button
                       size="sm"
+                      data-testid="edit-btn"
                       variant="info"
                       onClick={() => handleEdit(item.id)}
                     >
                       Edit
                     </Button>{" "}
                     <Button
-                      size="sm"
+                      size="sm" 
                       variant="danger"
                       onClick={() => handleDelete(item.id)}
                     >
